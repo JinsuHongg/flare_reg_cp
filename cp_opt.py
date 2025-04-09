@@ -32,8 +32,9 @@ if __name__ == "__main__":
     # CUDA for PyTorch
     
     use_cuda = torch.cuda.is_available()
-    if isinstance(config["cuda"]["device"], int):  
-        device = torch.device("cuda: {config.cuda.device}" if use_cuda else "cpu")
+    if isinstance(config["cuda"]["device"], int):
+        print(config["cuda"]["device"])
+        device = torch.device(f"cuda:{config['cuda']['device']}" if use_cuda else "cpu")
     else:
         device = torch.device("cuda" if use_cuda else "cpu")
     torch.backends.cudnn.benchmark = True
@@ -53,7 +54,7 @@ if __name__ == "__main__":
     # print out experiment setting
     print(f"Model: {config['model']['name']}")
     for key, value in config['optimize'].items():
-        print(key, value)
+        print(f"{key}: {value}")
 
     # Define dataset here!
     # train/test set
@@ -87,10 +88,13 @@ if __name__ == "__main__":
     training_result = []
     for wt in config['optimize']['wt_decay']:
         
-        net = get_model(config['model'])
-        model = nn.DataParallel(net, device_ids=config['cuda']['device']).to(device) # multiple devices
+        if isinstance(config['cuda'], list):
+            net = get_model(config['model'])
+            model = nn.DataParallel(net, device_ids=config['cuda']['device']).to(device) # multiple devices
+            device = next(model.parameters()).device
+        else:
+            model = get_model(config['model'])
 
-        device = next(model.parameters()).device
         loss_fn = nn.MSELoss() if config['model']['mode'] == 'cp' else quantile_loss(quantile_val = config['model']['q_val'])
         optimizer = torch.optim.SGD(model.parameters(), lr=config['optimize']['lr'], weight_decay=wt)
         scheduler = torch.optim.lr_scheduler.OneCycleLR(

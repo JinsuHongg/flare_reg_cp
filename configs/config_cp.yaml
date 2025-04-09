@@ -4,7 +4,7 @@ dir:
   save_dir: "./results"
 
 cuda:
-  device: [0, 1]
+  device: 0 #[0, 1]
 
 model:
   name: "Resnet18"
