@@ -33,10 +33,10 @@ def hourly_obs(df_fl: pd.DataFrame, img_dir, start, stop, class_type="bin"):
         hour = timestep.hour
 
         f_name = f"HMI.m{year}.{month:02d}.{day:02d}_{hour:02d}.00.00.jpg"
-        full_path = os.path.join(img_dir, str(year), str(month), str(day), f_name)
+        full_path = os.path.join(img_dir, str(year), f"{month:02d}", f"{day:02d}", f_name)
 
         window_start = pd.to_datetime(
-                f"{year}{month:02d}{day:02}_{hour}0000", format="%Y%m%d_%H%M%S"
+                f"{year}{month:02d}{day:02d}_{hour:02d}0000", format="%Y%m%d_%H%M%S"
             )
         window_end = window_start + pd.Timedelta(
             hours=23, minutes=59, seconds=59
