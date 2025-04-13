@@ -76,9 +76,9 @@ if __name__ == "__main__":
     df_test["Timestamp"] = pd.to_datetime(df_test["Timestamp"], format="%Y-%m-%d %H:%M:%S")
 
     # Define dataset
-    data_train = SolarFlSets(annotations_df=df_train, img_dir=img_dir, normalization=True)
-    data_cal = SolarFlSets(annotations_df=df_cal, img_dir=img_dir, normalization=True)
-    data_test = SolarFlSets(annotations_df=df_test, img_dir=img_dir, normalization=True)
+    data_train = SolarFlSets(annotations_df=df_train, img_dir=img_dir, normalization=True, target_transform=True)
+    data_cal = SolarFlSets(annotations_df=df_cal, img_dir=img_dir, normalization=True, target_transform=True)
+    data_test = SolarFlSets(annotations_df=df_test, img_dir=img_dir, normalization=True, target_transform=True)
 
     data_train_total = ConcatDataset([data_train, data_cal])
 

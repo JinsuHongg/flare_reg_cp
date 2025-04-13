@@ -2,7 +2,7 @@ import torch
 
 # All neural network modules, nn.Linear, nn.Conv2d, BatchNorm, Loss functions
 import torch.nn as nn
-from torchvision.models import ResNet50_Weights, ResNet18_Weights
+from torchvision.models import resnet50, resnet18, ResNet50_Weights, ResNet18_Weights
 
 def get_model(model_cfg: dict):
     name = model_cfg.get("name", "Resnet18")
@@ -21,10 +21,12 @@ class Resnet18(nn.Module):
         super(Resnet18, self).__init__()
 
         # load pretrained architecture from pytorch
-        torch.hub._validate_not_a_forked_repo = lambda a, b, c: True
-        self.model = torch.hub.load(
-            "pytorch/vision:v0.10.0", "resnet18", weights=ResNet18_Weights.IMAGENET1K_V1
-        )
+        # torch.hub._validate_not_a_forked_repo = lambda a, b, c: True
+        # self.model = torch.hub.load(
+        #     "pytorch/vision:v0.10.0", "resnet18", weights=ResNet18_Weights.IMAGENET1K_V1
+        # )
+        self.model = resnet18(weights=ResNet18_Weights.IMAGENET1K_V1)
+
         # Modify the fully connected (FC) layer with dropout
         if mode == 'cp':
             self.model.fc = nn.Sequential(
@@ -71,10 +73,12 @@ class Resnet50(nn.Module):
         super(Resnet50, self).__init__()
 
         # load pretrained architecture from pytorch
-        torch.hub._validate_not_a_forked_repo = lambda a, b, c: True
-        self.model = torch.hub.load(
-            "pytorch/vision:v0.10.0", "resnet50", weights=ResNet50_Weights.IMAGENET1K_V1
-        )
+        # torch.hub._validate_not_a_forked_repo = lambda a, b, c: True
+        # self.model = torch.hub.load(
+        #     "pytorch/vision:v0.10.0", "resnet50", weights=ResNet50_Weights.IMAGENET1K_V1
+        # )
+        self.model = resnet50(weights=ResNet50_Weights.IMAGENET1K_V1)
+
         # Modify the fully connected (FC) layer with dropout
         if mode == 'cp':
             self.model.fc = nn.Sequential(
