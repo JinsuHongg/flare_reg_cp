@@ -1,0 +1,23 @@
+dir:
+  img_dir: "/workspace/data/hmi_jpgs_512"
+  index_dir: "./training/data_split"
+  save_dir: "./results"
+
+cuda:
+  device: 0 #[0, 1]
+
+model:
+  name: "Resnet18"
+  mode: "qr"
+  dropout: 0.5
+  q_val: [0.1, 0.9]
+
+scheduler:
+  max_lr: 0.0001
+  div_factor: 100000
+  epochs: 30
+
+optimize:
+  lr: 0.001
+  batch_size: 16
+  wt_decay: [0, 0.01, 0.001, 0.0001]

@@ -7,14 +7,14 @@ cuda:
   device: 0 #[0, 1]
 
 model:
-  name: "Resnet18"
+  name: "Resnet50"
   mode: "cp"
   dropout: 0.5
 
 scheduler:
   max_lr: 0.0001
   div_factor: 100000
-  epochs: 50
+  epochs: 30
 
 optimize:
   lr: 0.001

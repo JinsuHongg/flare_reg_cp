@@ -1,7 +1,10 @@
 # etc
+*.pth
 *.jpg
+*.npz
 *.png
 *.pdf
+*.csv
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

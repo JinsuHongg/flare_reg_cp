@@ -11,7 +11,7 @@ def get_model(model_cfg: dict):
 
     if name == "Resnet18":
         return Resnet18(dropout=dropout, mode=mode)
-    elif name == "Resnet34":
+    elif name == "Resnet50":
         return Resnet50(dropout=dropout, mode=mode)
     else:
         raise ValueError(f"Unknown model name: {name}")
@@ -28,16 +28,19 @@ class Resnet18(nn.Module):
         # Modify the fully connected (FC) layer with dropout
         if mode == 'cp':
             self.model.fc = nn.Sequential(
-                nn.Linear(self.model.fc.in_features, 1)
+                nn.Linear(self.model.fc.in_features, 1),
+                nn.ReLU()
             )
         elif mode == 'qr':
             self.model.fc = nn.Sequential(
-                nn.Linear(self.model.fc.in_features, 2)
+                nn.Linear(self.model.fc.in_features, 2),
+                nn.ReLU()
             )
         elif mode == 'mcd':
             self.model.fc = nn.Sequential(
                 nn.Dropout(p=dropout),  # Apply MC Dropout
-                nn.Linear(self.model.fc.in_features, 1)
+                nn.Linear(self.model.fc.in_features, 1),
+                nn.ReLU()
             )
         else:
             raise ValueError(f"Invalid mode '{mode}'. Supported modes are: 'cp', 'qr', 'mcd'.")
@@ -75,16 +78,19 @@ class Resnet50(nn.Module):
         # Modify the fully connected (FC) layer with dropout
         if mode == 'cp':
             self.model.fc = nn.Sequential(
-                nn.Linear(self.model.fc.in_features, 1)
+                nn.Linear(self.model.fc.in_features, 1),
+                nn.ReLU()
             )
         elif mode == 'qr':
             self.model.fc = nn.Sequential(
-                nn.Linear(self.model.fc.in_features, 2)
+                nn.Linear(self.model.fc.in_features, 2),
+                nn.ReLU()
             )
         elif mode == 'mcd':
             self.model.fc = nn.Sequential(
                 nn.Dropout(p=dropout),  # Apply MC Dropout
-                nn.Linear(self.model.fc.in_features, 1)
+                nn.Linear(self.model.fc.in_features, 1),
+                nn.ReLU()
             )
         else:
             raise ValueError(f"Invalid mode '{mode}'. Supported modes are: 'cp', 'qr', 'mcd'.")

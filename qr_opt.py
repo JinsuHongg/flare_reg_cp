@@ -14,18 +14,18 @@ from sklearn.metrics import r2_score
 import torch
 import torch.nn as nn
 # import torchvision.transforms as transforms
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, ConcatDataset
 
 # predefined class
 from training.loss import QuantileLoss
 from training.models import get_model
 from training.dataloader import  SolarFlSets
-from training.trainloop import train_loop, test_loop
+from training.trainloop import train_loop, test_loop, train_loop_qr, test_loop_qr
 
 if __name__ == "__main__":
 
     # Load config file
-    config_path = "./configs/config_cp.yaml"
+    config_path = "./configs/config_qr.yaml"
     with open(config_path, "r") as f:
         config = yaml.safe_load(f)
 
@@ -52,6 +52,7 @@ if __name__ == "__main__":
 
     # print out experiment setting
     print(f"Model: {config['model']['name']}")
+    print(f"Quantile: {config['model']['q_val']}")
     for key, value in config['optimize'].items():
         print(f"{key}: {value}")
 
@@ -60,20 +61,29 @@ if __name__ == "__main__":
     df_train = pd.read_csv(
         os.path.join(index_dir, "24image_reg_train.csv")
     )
+
+    df_cal = pd.read_csv(
+        os.path.join(index_dir, "24image_reg_cal.csv")
+    )
+
     df_test = pd.read_csv(
         os.path.join(index_dir, "24image_reg_test.csv")
     )
 
     # # string to datetime
     df_train["Timestamp"] = pd.to_datetime(df_train["Timestamp"], format="%Y-%m-%d %H:%M:%S")
+    df_cal["Timestamp"] = pd.to_datetime(df_cal["Timestamp"], format="%Y-%m-%d %H:%M:%S")
     df_test["Timestamp"] = pd.to_datetime(df_test["Timestamp"], format="%Y-%m-%d %H:%M:%S")
 
     # Define dataset
     data_train = SolarFlSets(annotations_df=df_train, img_dir=img_dir, normalization=True)
+    data_cal = SolarFlSets(annotations_df=df_cal, img_dir=img_dir, normalization=True)
     data_test = SolarFlSets(annotations_df=df_test, img_dir=img_dir, normalization=True)
 
+    data_train_total = ConcatDataset([data_train, data_cal])
+
     # Data loader
-    train_dataloader = DataLoader(data_train, batch_size=config["optimize"]["batch_size"], shuffle=True)
+    train_dataloader = DataLoader(data_train_total, batch_size=config["optimize"]["batch_size"], shuffle=True)
     test_dataloader = DataLoader(data_test, batch_size=config["optimize"]["batch_size"], shuffle=False)
 
     
@@ -92,7 +102,7 @@ if __name__ == "__main__":
         else:
             model = get_model(config['model']).to(device)
 
-        loss_fn = nn.MSELoss() if config['model']['mode'] == 'cp' else QuantileLoss(quantile_val = config['model']['q_val'])
+        loss_fn = nn.MSELoss() if config['model']['mode'] == 'cp' else QuantileLoss(quantiles = config['model']['q_val'])
         optimizer = torch.optim.SGD(model.parameters(), lr=config['optimize']['lr'], weight_decay=wt)
         scheduler = torch.optim.lr_scheduler.OneCycleLR(
             optimizer,
@@ -112,18 +122,18 @@ if __name__ == "__main__":
             year = datetime_object.year
             month = datetime_object.month
 
-            train_loss, train_dict = train_loop(
+            train_loss, train_dict = train_loop_qr(
                 train_dataloader,
                 model=model,
                 loss_fn=loss_fn,
                 optimizer=optimizer,
                 lr_scheduler=scheduler
             )
-            test_loss, test_dict = test_loop(
+            test_loss, test_dict = test_loop_qr(
                 test_dataloader, model=model, loss_fn=loss_fn
             )
-            train_r2 = r2_score(train_dict['label'], train_dict['prediction']) # r2_score(y_true, y_pred)
-            test_r2 = r2_score(test_dict['label'], test_dict['prediction']) # r2_score(y_true, y_pred)
+            train_r2 = r2_score(train_dict['label'], np.mean(train_dict['prediction'], axis = 1)) # r2_score(y_true, y_pred)
+            test_r2 = r2_score(test_dict['label'], np.mean(test_dict['prediction'], axis = 1)) # r2_score(y_true, y_pred)
 
             # trace score and predictions
             duration = (time.time() - t0) / 60
@@ -155,7 +165,8 @@ if __name__ == "__main__":
                 model_save_path = os.path.join(
                     save_dir,
                     "model", 
-                    f"{config['model']['name']}_{year}{month:02d}_reg_{config['model']['mode']}.pth"
+                    (f"{config['model']['name']}_{year}{month:02d}_reg_{config['model']['mode']}_"
+                    + f"qlow{config['model']['q_val'][0]*100:.0f}_qhigh{config['model']['q_val'][1]*100:.0f}.pth")
                     )
                 # save model
                 torch.save(
@@ -173,7 +184,8 @@ if __name__ == "__main__":
                 pred_path = os.path.join(
                     save_dir,
                     "log",
-                    f"{config['model']['name']}_{year}{month:02d}_reg_{config['model']['mode']}.npz"
+                    (f"{config['model']['name']}_{year}{month:02d}_reg_{config['model']['mode']}_"
+                    + f"qlow{config['model']['q_val'][0]*100:.0f}_qhigh{config['model']['q_val'][1]*100:.0f}.npz")
                 )
 
                 np.savez(pred_path, train=train_dict, test=test_dict)
@@ -205,7 +217,8 @@ if __name__ == "__main__":
     total_save_path = os.path.join(
         save_dir,
         "optimization",
-        f"{config['model']['name']}_{year}{month:02d}_validation_{config['model']['mode']}_results.csv"
+        (f"{config['model']['name']}_{year}{month:02d}_validation_{config['model']['mode']}_"
+        +f"qlow{config['model']['q_val'][0]*100:.0f}_qhigh{config['model']['q_val'][1]*100:.0f}_results.csv")
     )
 
     print("Save file here:", total_save_path)
