@@ -57,12 +57,12 @@ if __name__ == "__main__":
 
     # Define dataset here!
     # train/test set
-    df_train = pd.read_csv(
-        os.path.join(index_dir, "24image_reg_train.csv")
-    )
-    df_test = pd.read_csv(
-        os.path.join(index_dir, "24image_reg_test.csv")
-    )
+
+    df_train_list = [pd.read_csv(index_dir + '/' + file) for file in config['dir']['train_p']]
+    df_train = pd.concat(df_train_list, ignore_index=True)
+    
+    df_test_list = [pd.read_csv(index_dir + '/' + file) for file in config['dir']['test_p']]
+    df_test = pd.concat(df_test_list, ignore_index=True)
 
     # # string to datetime
     df_train["Timestamp"] = pd.to_datetime(df_train["Timestamp"], format="%Y-%m-%d %H:%M:%S")
@@ -71,6 +71,7 @@ if __name__ == "__main__":
     # Define dataset
     data_train = SolarFlSets(annotations_df=df_train, img_dir=img_dir, normalization=True)
     data_test = SolarFlSets(annotations_df=df_test, img_dir=img_dir, normalization=True)
+    print(f'Num of train: {len(data_train)}, Num of test: {len(data_test)}')
 
     # Data loader
     train_dataloader = DataLoader(data_train, batch_size=config["optimize"]["batch_size"], shuffle=True)

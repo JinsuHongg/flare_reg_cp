@@ -1,19 +1,21 @@
 dir:
   img_dir: "/workspace/data/hmi_jpgs_512"
   index_dir: "./training/data_split"
+  train_p: ["24image_reg_P1.csv", "24image_reg_P2.csv"]
+  test_p: ["24image_reg_P4.csv"]
   save_dir: "./results"
 
 cuda:
   device: 0 #[0, 1]
 
 model:
-  name: "Resnet50"
+  name: "Resnet18"
   mode: "cp"
   dropout: 0.5
 
 scheduler:
   max_lr: 0.0001
-  div_factor: 100000
+  div_factor: 10000
   epochs: 30
 
 optimize:

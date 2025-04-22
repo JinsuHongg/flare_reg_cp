@@ -1,6 +1,8 @@
 dir:
   img_dir: "/workspace/data/hmi_jpgs_512"
   index_dir: "./training/data_split"
+  train_p: ["24image_reg_P1.csv", "24image_reg_P2.csv", "24image_reg_P3.csv"]
+  test_p: ["24image_reg_P4.csv"]
   save_dir: "./results"
 
 cuda:
@@ -10,12 +12,12 @@ model:
   name: "Resnet50"
   mode: "qr"
   dropout: 0.5
-  q_val: [0.1, 0.9] #[0.025, 0.975], [0.05, 0.95], [0.075, 0.925], [0.1. 0.9]
+  q_val: [0.025, 0.975] #[0.025, 0.975], [0.05, 0.95], [0.075, 0.925], [0.1. 0.9]
 
 scheduler:
   max_lr: 0.001
   div_factor: 10000
-  epochs: 30
+  epochs: 50
 
 optimize:
   lr: 0.001

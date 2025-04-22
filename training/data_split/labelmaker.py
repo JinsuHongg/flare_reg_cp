@@ -106,6 +106,7 @@ def find_max_intensity_reg(
 
 # Creating time-segmented 4 tri-monthly partitions
 def create_partitions(df, savepath:str):
+    df = df.drop(df.loc[df['present'] == 0, :].index, axis = 0)
     search_list = [['01', '02', '03'], ['04', '05', '06'], ['07', '08', '09'], ['10', '11', '12']]
     for i in range(4):
         search_for = search_list[i]
@@ -120,10 +121,9 @@ def create_partitions(df, savepath:str):
             
         # Dumping the dataframe into CSV with label as Date and goes_class as intensity
         partition.to_csv(
-            savepath + f'24image_reg_P{i + 1}.csv',
+            savepath + f'/24image_reg_P{i + 1}.csv',
             index = False, 
-            header = True, 
-            columns = ['Timestamp', 'goes_class', 'goes_class_num']
+            header = True
             )
 
 

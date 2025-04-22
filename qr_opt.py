@@ -58,32 +58,23 @@ if __name__ == "__main__":
 
     # Define dataset here!
     # train/test set
-    df_train = pd.read_csv(
-        os.path.join(index_dir, "24image_reg_train.csv")
-    )
-
-    df_cal = pd.read_csv(
-        os.path.join(index_dir, "24image_reg_cal.csv")
-    )
-
-    df_test = pd.read_csv(
-        os.path.join(index_dir, "24image_reg_test.csv")
-    )
+    df_train_list = [pd.read_csv(index_dir + '/' + file) for file in config['dir']['train_p']]
+    df_train = pd.concat(df_train_list, ignore_index=True)
+    
+    df_test_list = [pd.read_csv(index_dir + '/' + file) for file in config['dir']['test_p']]
+    df_test = pd.concat(df_test_list, ignore_index=True)
 
     # # string to datetime
     df_train["Timestamp"] = pd.to_datetime(df_train["Timestamp"], format="%Y-%m-%d %H:%M:%S")
-    df_cal["Timestamp"] = pd.to_datetime(df_cal["Timestamp"], format="%Y-%m-%d %H:%M:%S")
     df_test["Timestamp"] = pd.to_datetime(df_test["Timestamp"], format="%Y-%m-%d %H:%M:%S")
 
     # Define dataset
     data_train = SolarFlSets(annotations_df=df_train, img_dir=img_dir, normalization=True, target_transform=True)
-    data_cal = SolarFlSets(annotations_df=df_cal, img_dir=img_dir, normalization=True, target_transform=True)
     data_test = SolarFlSets(annotations_df=df_test, img_dir=img_dir, normalization=True, target_transform=True)
-
-    data_train_total = ConcatDataset([data_train, data_cal])
+    print(f'Num of train: {len(data_train)}, Num of test: {len(data_test)}')
 
     # Data loader
-    train_dataloader = DataLoader(data_train_total, batch_size=config["optimize"]["batch_size"], shuffle=True)
+    train_dataloader = DataLoader(data_train, batch_size=config["optimize"]["batch_size"], shuffle=True)
     test_dataloader = DataLoader(data_test, batch_size=config["optimize"]["batch_size"], shuffle=False)
 
     
