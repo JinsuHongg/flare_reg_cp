@@ -105,26 +105,26 @@ def find_max_intensity_reg(
 
 
 # Creating time-segmented 4 tri-monthly partitions
-def split_dataset(df, savepath="/", class_type="bin"):
-    search_list = [["2011", "2012", "2013"], ["2014"]]
-    for i in range(2):
+def create_partitions(df, savepath:str):
+    search_list = [['01', '02', '03'], ['04', '05', '06'], ['07', '08', '09'], ['10', '11', '12']]
+    for i in range(4):
         search_for = search_list[i]
-        mask = (
-            df["Timestamp"]
-            .apply(lambda row: row[0:4])
-            .str.contains("|".join(search_for))
-        )
+        mask = df['Timestamp'].apply(lambda row: row[5:7]).str.contains('|'.join(search_for))
         partition = df[mask]
-        print(partition["label"].value_counts())
-
+        print(partition['label'].value_counts())
+        
+        # Make directory 
+        if not os.path.isdir(savepath):
+            os.mkdir(savepath)
+            print('Created directory:', savepath)
+            
         # Dumping the dataframe into CSV with label as Date and goes_class as intensity
-        flag = "train" if i == 0 else "test"
         partition.to_csv(
-            savepath + f"/24image_{class_type}_class_{flag}.csv",
-            index=False,
-            header=True,
-            columns=df.columns
-        )
+            savepath + f'24image_reg_P{i + 1}.csv',
+            index = False, 
+            header = True, 
+            columns = ['Timestamp', 'goes_class', 'goes_class_num']
+            )
 
 
 def stratified_dataset(df, savepath, task_type="reg"):
@@ -188,4 +188,5 @@ if __name__ == "__main__":
         stop=end_time,
         class_type="bin",
     )
-    stratified_dataset(df_res, savepath=savepath, task_type="reg")
+    # stratified_dataset(df_res, savepath=savepath, task_type="reg")
+    create_partitions(df_res, savepath=savepath)
