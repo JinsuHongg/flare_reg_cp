@@ -33,7 +33,7 @@ class Resnet18(nn.Module):
                 nn.Linear(self.model.fc.in_features, 1),
                 nn.ReLU()
             )
-        elif mode == 'qr':
+        elif mode == 'qr' or mode == 'cqr':
             self.model.fc = nn.Sequential(
                 nn.Linear(self.model.fc.in_features, 2),
                 nn.ReLU()
@@ -45,7 +45,7 @@ class Resnet18(nn.Module):
                 nn.ReLU()
             )
         else:
-            raise ValueError(f"Invalid mode '{mode}'. Supported modes are: 'cp', 'qr', 'mcd'.")
+            raise ValueError(f"Invalid mode '{mode}'. Supported modes are: 'cp', 'qr', 'cqr', 'mcd'.")
 
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -85,7 +85,7 @@ class Resnet50(nn.Module):
                 nn.Linear(self.model.fc.in_features, 1),
                 nn.ReLU()
             )
-        elif mode == 'qr':
+        elif mode == 'qr' or mode == 'cqr':
             self.model.fc = nn.Sequential(
                 nn.Linear(self.model.fc.in_features, 2),
                 nn.ReLU()
@@ -97,7 +97,7 @@ class Resnet50(nn.Module):
                 nn.ReLU()
             )
         else:
-            raise ValueError(f"Invalid mode '{mode}'. Supported modes are: 'cp', 'qr', 'mcd'.")
+            raise ValueError(f"Invalid mode '{mode}'. Supported modes are: 'cp', 'qr', 'cqr', 'mcd'.")
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.model(x)
