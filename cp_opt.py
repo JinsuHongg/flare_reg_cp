@@ -30,7 +30,6 @@ if __name__ == "__main__":
         config = yaml.safe_load(f)
 
     # CUDA for PyTorch
-    
     use_cuda = torch.cuda.is_available()
     if isinstance(config["cuda"]["device"], int):
         device = torch.device(f"cuda:{config['cuda']['device']}" if use_cuda else "cpu")
@@ -69,8 +68,8 @@ if __name__ == "__main__":
     df_test["Timestamp"] = pd.to_datetime(df_test["Timestamp"], format="%Y-%m-%d %H:%M:%S")
 
     # Define dataset
-    data_train = SolarFlSets(annotations_df=df_train, img_dir=img_dir, normalization=True)
-    data_test = SolarFlSets(annotations_df=df_test, img_dir=img_dir, normalization=True)
+    data_train = SolarFlSets(annotations_df=df_train, img_dir=img_dir, normalization=True, target_transform=True)
+    data_test = SolarFlSets(annotations_df=df_test, img_dir=img_dir, normalization=True, target_transform=True)
     print(f'Num of train: {len(data_train)}, Num of test: {len(data_test)}')
 
     # Data loader

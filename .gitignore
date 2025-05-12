@@ -1,4 +1,5 @@
 # etc
+*.npy
 *.pth
 *.jpg
 *.npz

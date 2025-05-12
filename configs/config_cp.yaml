@@ -1,9 +1,10 @@
 dir:
   img_dir: "/workspace/data/hmi_jpgs_512"
   index_dir: "./training/data_split"
-  train_p: ["24image_reg_P1.csv", "24image_reg_P2.csv"]
-  test_p: ["24image_reg_P4.csv"]
   save_dir: "./results"
+  train_p: ["24image_reg_P1.csv", "24image_reg_P2.csv"]
+  cal_p: ["24image_reg_P3.csv"]
+  test_p: ["24image_reg_P4.csv"]
 
 cuda:
   device: 0 #[0, 1]

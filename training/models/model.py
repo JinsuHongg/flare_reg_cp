@@ -25,8 +25,9 @@ class Resnet18(nn.Module):
         # self.model = torch.hub.load(
         #     "pytorch/vision:v0.10.0", "resnet18", weights=ResNet18_Weights.IMAGENET1K_V1
         # )
+        
         self.model = resnet18(weights=ResNet18_Weights.IMAGENET1K_V1)
-
+        
         # Modify the fully connected (FC) layer with dropout
         if mode == 'cp':
             self.model.fc = nn.Sequential(
@@ -66,8 +67,6 @@ class Resnet18(nn.Module):
         return preds.mean(dim=0), preds.std(dim=0)  # Mean and uncertainty
 
 
-
-
 class Resnet50(nn.Module):
     def __init__(self, dropout: float = 0.5, mode:str = "cp") -> None:
         super(Resnet50, self).__init__()
@@ -77,8 +76,9 @@ class Resnet50(nn.Module):
         # self.model = torch.hub.load(
         #     "pytorch/vision:v0.10.0", "resnet50", weights=ResNet50_Weights.IMAGENET1K_V1
         # )
-        self.model = resnet50(weights=ResNet50_Weights.IMAGENET1K_V1)
 
+        self.model = resnet50(weights=ResNet50_Weights.IMAGENET1K_V1)
+        
         # Modify the fully connected (FC) layer with dropout
         if mode == 'cp':
             self.model.fc = nn.Sequential(

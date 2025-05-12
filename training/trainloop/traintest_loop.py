@@ -108,7 +108,7 @@ def train_loop_qr(dataloader, model, loss_fn, optimizer=None, lr_scheduler=None)
 
     return float(train_loss), pred_dict
 
-def test_loop(dataloader, model, loss_fn, softmax = None):
+def test_loop(dataloader, model, loss_fn):
     # Set the model to evaluation mode - important for batch normalization and dropout layers
     # Unnecessary in this situation but added for best practices
     device = next(model.parameters()).device
@@ -147,7 +147,7 @@ def test_loop(dataloader, model, loss_fn, softmax = None):
     # print(f"Test loss: {test_loss:.4f}")
     return test_loss, pred_dict
 
-def test_loop_qr(dataloader, model, loss_fn, softmax = None):
+def test_loop_qr(dataloader, model, loss_fn):
     # Set the model to evaluation mode - important for batch normalization and dropout layers
     # Unnecessary in this situation but added for best practices
     device = next(model.parameters()).device
@@ -157,8 +157,8 @@ def test_loop_qr(dataloader, model, loss_fn, softmax = None):
     test_loss = 0
     # pred_arr = np.empty((0, 6), float)
     pred_dict = {
-        'prediction': np.empty((0, 2), int),
-        'label': np.empty((0, 1), int)
+        'prediction': np.empty((0, 2), np.float32),
+        'label': np.empty((0, 1), np.float32)
         }
     # Evaluating the model with torch.no_grad() ensures that no gradients are computed during test mode
     # also serves to reduce unnecessary gradient computations and memory usage for tensors with requires_grad=True
@@ -166,7 +166,7 @@ def test_loop_qr(dataloader, model, loss_fn, softmax = None):
         for X, y in dataloader:
             X, y = X.to(device), y.to(device)
             y = y.to(torch.float32)
-            pred = model(X).squeeze(-1)
+            pred = model(X)
 
             test_loss += loss_fn(
                 pred, y
