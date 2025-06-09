@@ -193,6 +193,8 @@ if __name__ == "__main__":
 
                 np.savez(pred_path, train=train_dict, test=test_dict)
 
+    # Finish the run and upload any remaining data.
+    run.finish()
 
     training_result.append(
         [
