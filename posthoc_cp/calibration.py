@@ -50,10 +50,10 @@ class ConformalPredictor:
             raise ValueError(f"Unknown mode: {mode}. Choose 'cqr', 'cp', or 'mcp'.")
 
         if self.mondrian: 
-            bin_indices = np.digitize(label.flatten(), bins=self.bins, right=False).reshape(-1, 1)
+            bin_indices = np.digitize(label.flatten(), bins=self.bins, right=False)
 
             for category in np.unique(bin_indices):
-                mask = (bin_indices == category).flatten()
+                mask = (bin_indices == category)
                 if np.sum(mask) > 0:
                     self.q_hat_dict[category] = np.quantile(scores[mask], q=q_corrected, method='higher')
 
@@ -78,15 +78,15 @@ class ConformalPredictor:
 
             if not self.q_hat_dict:
                 raise ValueError("Call q_score() before pred_regions().")
-            base = test_arr
+            base = test_arr[:, 0]
             regions = np.stack((base, base), axis=1)
 
             if self.bins is None:
                 raise ValueError("Bins must be provided when using Mondrian conformal prediction.")
 
-            bin_indices = np.digitize(base.flatten(), bins=self.bins, right=False).reshape(-1, 1)
+            bin_indices = np.digitize(base, bins=self.bins, right=False)
             for category in np.unique(bin_indices):
-                mask = (bin_indices == category).flatten()
+                mask = (bin_indices == category)
                 q = self.q_hat_dict.get(category, 0)
                 regions[mask, 0] -= q
                 regions[mask, 1] += q
@@ -105,6 +105,6 @@ class ConformalPredictor:
                 if self.q_hat is None:
                     raise ValueError("Call q_score() before pred_regions().")
                 base = test_arr
-                lower = base - self.q_hat
-                upper = base + self.q_hat
+                lower = base[:, 0] - self.q_hat
+                upper = base[:, 0] + self.q_hat
                 return np.stack((lower, upper), axis=1)

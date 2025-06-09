@@ -5,6 +5,8 @@ import os
 import yaml
 import time
 import datetime
+import wandb
+
 # import argparse
 import numpy as np
 import pandas as pd
@@ -28,6 +30,19 @@ if __name__ == "__main__":
     config_path = "./configs/config_cp.yaml"
     with open(config_path, "r") as f:
         config = yaml.safe_load(f)
+
+    # initialize wandb
+    # Start a new wandb run to track this script.
+    run = wandb.init(
+        # Set the wandb entity where your project will be logged (generally your team name).
+        entity="gsu-dmlab",
+        # Set the wandb project where this run will be logged.
+        project="uncertainty-flare-regression",
+        # Track hyperparameters and run metadata.
+        config=config,
+        # selec mode: online, offline
+        mode = "online"
+    )
 
     # CUDA for PyTorch
     use_cuda = torch.cuda.is_available()
@@ -141,7 +156,7 @@ if __name__ == "__main__":
                 ]
             )
             torch.cuda.empty_cache()
-
+            run.log({"Train_loss": train_loss, "Test_loss": test_loss, "train_r2": train_r2, "test_r2": test_r2})
             # time consumption and report R-squared values.
             print(
                 f"Epoch {t+1}: Lr: {actual_lr:.3e}, Train loss: {train_loss:.4f}, Test loss: {test_loss:.4f}, "

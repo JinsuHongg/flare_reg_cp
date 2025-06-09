@@ -75,7 +75,7 @@ if __name__ == "__main__":
     df_cal = pd.concat(df_cal_list, ignore_index=True)
     df_cal["Timestamp"] = pd.to_datetime(df_cal["Timestamp"], format="%Y-%m-%d %H:%M:%S")
 
-    data_cal = SolarFlSets(annotations_df=df_cal, img_dir=img_dir, normalization=True, target_transform=True)
+    data_cal = SolarFlSets(annotations_df=df_cal, img_dir=img_dir, normalization=True) #, target_transform=True
     cal_dataloader = DataLoader(data_cal, batch_size=config["optimize"]["batch_size"], shuffle=False)
 
     loss_fn = nn.MSELoss() if mode == 'cp' else QuantileLoss(quantile_val = config['model']['q_val'])
