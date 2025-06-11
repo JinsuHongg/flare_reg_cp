@@ -38,6 +38,7 @@ if __name__ == "__main__":
         entity="gsu-dmlab",
         # Set the wandb project where this run will be logged.
         project="uncertainty-flare-regression",
+        name="conformal_pred_optimize", # Optional: The name you want to give your run
         # Track hyperparameters and run metadata.
         config=config,
         # selec mode: online, offline

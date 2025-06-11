@@ -10,7 +10,7 @@ cuda:
   device: 0 #[0, 1]
 
 model:
-  name: "Resnet152"
+  name: "Resnet34"
   mode: "cp"
   dropout: 0.5
 
